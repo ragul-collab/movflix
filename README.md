@@ -1,16 +1,88 @@
-# React + Vite
+# 🎬 Movflix
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A movie discovery web app built with React that lets you search, explore, and save your favourite movies.
 
-Currently, two official plugins are available:
+🔗 **Live Demo:** [ragul07-movflix.vercel.app](https://ragul07-movflix.vercel.app)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- 🔍 Search movies by title
+- 🎥 Browse trending & popular movies
+- ⭐ View IMDb ratings and genres
+- 🖼️ Movie posters and overviews
+- ❤️ Add / remove movies from favourites
+- 💾 Favourites saved locally (persists on refresh)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠️ Tech Stack
+
+- **React** + **Vite**
+- **Trakt API** — movie data, ratings, genres, trending
+- **OMDb API** — posters and IMDb metadata
+- **CSS** — custom styling
+- **Vercel** — deployment
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repo
+```bash
+git clone https://github.com/ragul-collab/movflix.git
+cd movflix/frontend
+```
+
+### 2. Install dependencies
+```bash
+npm install
+```
+
+### 3. Set up environment variables
+
+Create a `.env` file in the root folder:
+```properties
+VITE_TRAKT_API_KEY=your_trakt_client_id
+VITE_OMDB_API_KEY=your_omdb_api_key
+```
+
+Get your free API keys:
+- Trakt → [trakt.tv/oauth/applications/new](https://trakt.tv/oauth/applications/new)
+- OMDb → [omdbapi.com/apikey.aspx](http://www.omdbapi.com/apikey.aspx)
+
+### 4. Run the app
+```bash
+npm run dev
+```
+
+---
+
+## 📁 Project Structure
+```
+src/
+├── components/
+│   ├── MovieCard.jsx
+│   └── NavBar.jsx
+├── context/
+│   └── MovieContext.jsx
+├── pages/
+│   ├── Home.jsx
+│   └── Favourites.jsx
+├── services/
+│   └── api.js
+└── css/
+```
+
+---
+
+## 🌐 Deployment
+
+Deployed on **Vercel** with environment variables configured in the dashboard.
+
+---
+
+## 👤 Author
+
+**Ragul** — [github.com/ragul-collab](https://github.com/ragul-collab)
