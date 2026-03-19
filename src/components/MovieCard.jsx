@@ -1,15 +1,6 @@
 import '../css/MovieCard.css'
 import { useMovieContext } from '../context/MovieContext';
 
-const GENRE_MAP = {
-    28: "Action", 12: "Adventure", 16: "Animation",
-    35: "Comedy", 80: "Crime", 99: "Documentary",
-    18: "Drama", 10751: "Family", 14: "Fantasy",
-    36: "History", 27: "Horror", 10402: "Music",
-    9648: "Mystery", 10749: "Romance", 878: "Sci-Fi",
-    53: "Thriller", 10752: "War", 37: "Western"
-}
-
 function MovieCard({ movie }) {
     const {isFavorite, addToFavorites, removeFromFavorites} = useMovieContext()
     const favorite = isFavorite(movie.id)
@@ -29,15 +20,15 @@ function MovieCard({ movie }) {
     return (
         <div className="movie-card">
             <div className="movie-poster">
-                <img src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} alt={movie.title} />
+                <img src={movie.poster_path || "/no-poster.png"} alt={movie.title} />
             </div>
 
-            {/* ✅ Rating Badge */}
+            {/* Rating Badge */}
             <div className="movie-rating" style={{backgroundColor: getRatingColor(movie.vote_average)}}>
                 ⭐ {movie.vote_average.toFixed(1)}
             </div>
 
-            {/* ✅ Overlay with overview */}
+            {/* Overlay with overview */}
             <div className="movie-overlay">
                 <button className={`favorite-btn ${favorite ? "active" : ""}`} onClick={handleFavourite}>
                     <span className="heart-icon">❤️</span>
@@ -49,16 +40,16 @@ function MovieCard({ movie }) {
                 <h3>{movie.title}</h3>
                 <p>{movie.release_date?.split("-")[0]}</p>
 
-                {/* ✅ Popularity */}
+                {/* Popularity */}
                 <div className="movie-popularity">
                     🔥 {movie.popularity.toFixed(0)} popularity
                 </div>
 
-                {/* ✅ Genres */}
+                {/* Genres */}
                 <div className="movie-genres">
-                    {movie.genre_ids.slice(0, 3).map(id => (
-                        <span key={id} className="genre-tag">
-                            {GENRE_MAP[id] || "Other"}
+                    {movie.genre_ids.slice(0, 3).map(genre => (
+                        <span key={genre} className="genre-tag">
+                            {genre}
                         </span>
                     ))}
                 </div>
@@ -66,4 +57,5 @@ function MovieCard({ movie }) {
         </div>
     )
 }
+
 export default MovieCard;
