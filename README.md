@@ -102,4 +102,4 @@ This app is deployed on **Vercel**. Environment variables are configured in the 
 
 ## 📝 License
 
-ragul-collab
+MIT
