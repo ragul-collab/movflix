@@ -2,7 +2,7 @@
 
 A movie discovery web app built with React, powered by the **Trakt** and **OMDb** APIs.
 
-🌐 **Live Demo:** [movflix-rho.vercel.app](https://movflix-rho.vercel.app)
+🌐 **Live Demo:** [ragul07-movflix.vercel.app](ragul07-movflix.vercel.app/)
 
 ## ✨ Features
 
