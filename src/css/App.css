@@ -1,54 +1,24 @@
-/* DARK MODE */
-.dark {
-    background-color: #121212;
-    color: #ffffff;
+/* Wrapper handles min height */
+.app-container {
     min-height: 100vh;
-}
-
-/* LIGHT MODE */
-.light {
-    background-color: #f5f5f5;
-    color: #121212;
-    min-height: 100vh;
-}
-
-.light .movie-card {
-    background-color: #ffffff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.light .movie-info h3 {
-    color: #121212;
-}
-
-.light .movie-info p {
-    color: #555555;
-}
-
-.light .navbar {
-    background: linear-gradient(90deg, #1a1a2e, #16213e);
-}
-
-.light .search-input {
-    background-color: #ffffff;
-    color: #121212;
-    border: 1px solid #cccccc;
-}
-
-.light .search-input:focus {
-    box-shadow: 0 0 0 2px #e50914;
 }
 
 /* MAIN CONTENT */
 .main-content {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 100px 1rem 2rem; /* Clearing the fixed navbar */
     box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
     .main-content {
-        padding: 0 0.5rem;
+        padding: 85px 0.5rem 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-content {
+        padding: 110px 0.5rem 2rem; /* Navbar wraps on small mobile making it taller */
     }
 }

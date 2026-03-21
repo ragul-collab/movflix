@@ -1,16 +1,50 @@
 :root {
+  /* DARK MODE VARIABLES (DEFAULT) */
+  --bg-primary: #121212;
+  --bg-secondary: #1a1a1a;
+  --text-primary: #ffffff;
+  --text-secondary: #999999;
+  --text-muted: rgba(255, 255, 255, 0.8);
+  --nav-bg: linear-gradient(90deg, #0f0f0f, #1a1a2e);
+  --accent-color: #e50914;
+  --accent-hover: #f40612;
+  --card-shadow: none;
+  --border-color: #333333;
+  --input-bg: #333333;
+  --input-focus: #e50914;
+
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body.light, .light {
+  /* LIGHT MODE VARIABLES */
+  --bg-primary: #f5f5f5;
+  --bg-secondary: #ffffff;
+  --text-primary: #121212;
+  --text-secondary: #555555;
+  --text-muted: rgba(0, 0, 0, 0.7);
+  --nav-bg: #ffffff;
+  --accent-color: #e50914;
+  --accent-hover: #f40612;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  --border-color: #cccccc;
+  --input-bg: #ffffff;
+  --input-focus: #e50914;
+  
+  color-scheme: light;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
 }
 
 * {
@@ -58,27 +92,17 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--accent-color);
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
+/* Removed hardcoded media prefeers-color-scheme as we are handling it manually with .light class */

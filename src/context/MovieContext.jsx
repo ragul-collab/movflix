@@ -1,4 +1,5 @@
 import {createContext, useState, useContext, useEffect} from "react"
+import { useToast } from "./ToastContext"
 
 const MovieContext = createContext()
 
@@ -6,6 +7,7 @@ export const useMovieContext = () => useContext(MovieContext)
 
 export const MovieProvider = ({children}) => {
     const [favorites, setFavorites] = useState([])
+    const { showToast } = useToast()
 
     useEffect(() => {
         const storedFavs = localStorage.getItem("favorites")
@@ -19,10 +21,12 @@ export const MovieProvider = ({children}) => {
 
     const addToFavorites = (movie) => {
         setFavorites(prev => [...prev, movie])
+        showToast("Added to Favorites!", "success")
     }
 
     const removeFromFavorites = (movieId) => {
         setFavorites(prev => prev.filter(movie => movie.id !== movieId))
+        showToast("Removed from Favorites", "info")
     }
     
     const isFavorite = (movieId) => {

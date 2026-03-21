@@ -1,14 +1,17 @@
 .navbar {
-    background: linear-gradient(90deg, #0f0f0f, #1a1a2e);
+    background: var(--nav-bg);
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 10px rgba(229, 9, 20, 0.3);
-    border-bottom: 2px solid #e50914;
-    position: sticky;
+    border-bottom: 2px solid var(--accent-color);
+    position: fixed;
     top: 0;
-    z-index: 999;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 990;
 }
 
 /* MOVFLIX LOGO */
@@ -20,12 +23,12 @@
 }
 
 .brand-mov {
-    color: #ffffff;
+    color: var(--text-primary);
     font-size: 1.8rem;
 }
 
 .brand-flix {
-    color: #e50914;
+    color: var(--accent-color);
     font-size: 1.8rem;
 }
 
@@ -42,7 +45,7 @@
 }
 
 .nav-link {
-    color: #ffffffcc;
+    color: var(--text-muted);
     text-decoration: none;
     font-size: 1rem;
     font-weight: 500;
@@ -73,11 +76,10 @@
     width: 100%;
 }
 
-/* THEME TOGGLE BUTTON */
 .theme-toggle {
     background-color: transparent;
-    border: 2px solid #e50914;
-    color: #ffffff;
+    border: 2px solid var(--accent-color);
+    color: var(--text-primary);
     padding: 0.4rem 1rem;
     border-radius: 20px;
     cursor: pointer;

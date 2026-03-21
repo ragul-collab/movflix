@@ -14,17 +14,19 @@ const enrichWithPoster = async (movie) => {
     const res = await fetch(`https://www.omdbapi.com/?i=${imdbId}&apikey=${OMDB_KEY}`);
     const data = await res.json();
     return {
+      ...movie,
       id: movie.ids?.trakt,
       title: movie.title,
       overview: movie.overview || data.Plot || "",
       release_date: movie.released || data.Year || "",
       vote_average: parseFloat(data.imdbRating) || 0,
       popularity: movie.votes || 0,
-      poster_path: data.Poster !== "N/A" ? data.Poster : null,
+      poster_path: data.Poster !== "N/A" ? data.Poster.replace("SX300", "SX1000") : null,
       genre_ids: data.Genre ? data.Genre.split(", ") : [],
     };
   } catch {
     return {
+      ...movie,
       id: movie.ids?.trakt,
       title: movie.title,
       overview: movie.overview || "",
@@ -37,20 +39,36 @@ const enrichWithPoster = async (movie) => {
   }
 };
 
-export const getPopularMovies = async () => {
-  const res = await fetch(`${TRAKT_BASE}/movies/trending?limit=20`, {
+export const getPopularMovies = async (page = 1) => {
+  const res = await fetch(`${TRAKT_BASE}/movies/trending?limit=20&page=${page}`, {
     headers: TRAKT_HEADERS,
   });
   const data = await res.json();
   return Promise.all(data.map((item) => enrichWithPoster(item.movie)));
 };
 
-export const searchMovies = async (query) => {
+export const searchMovies = async (query, page = 1) => {
   const res = await fetch(
-    `${TRAKT_BASE}/search/movie?query=${encodeURIComponent(query)}&limit=20`,
+    `${TRAKT_BASE}/search/movie?query=${encodeURIComponent(query)}&limit=20&page=${page}`,
     { headers: TRAKT_HEADERS }
   );
   const data = await res.json();
   return Promise.all(data.map((item) => enrichWithPoster(item.movie)));
+};
+
+export const getMovieDetails = async (id) => {
+  const res = await fetch(`${TRAKT_BASE}/movies/${id}?extended=full`, {
+    headers: TRAKT_HEADERS,
+  });
+  const data = await res.json();
+  return enrichWithPoster(data);
+};
+
+export const getMovieCast = async (id) => {
+  const res = await fetch(`${TRAKT_BASE}/movies/${id}/people`, {
+    headers: TRAKT_HEADERS,
+  });
+  const data = await res.json();
+  return data.cast || [];
 };
 

@@ -1,12 +1,15 @@
 import '../css/MovieCard.css'
 import { useMovieContext } from '../context/MovieContext';
+import { useNavigate } from 'react-router-dom';
 
 function MovieCard({ movie }) {
     const {isFavorite, addToFavorites, removeFromFavorites} = useMovieContext()
     const favorite = isFavorite(movie.id)
+    const navigate = useNavigate();
 
     function handleFavourite(e) {
         e.preventDefault()
+        e.stopPropagation()
         if (favorite) removeFromFavorites(movie.id)
         else addToFavorites(movie)
     }
@@ -18,7 +21,7 @@ function MovieCard({ movie }) {
     }
 
     return (
-        <div className="movie-card">
+        <div className="movie-card" onClick={() => navigate(`/movie/${movie.id}`)} style={{ cursor: 'pointer' }}>
             <div className="movie-poster">
                 <img src={movie.poster_path || "/no-poster.png"} alt={movie.title} />
             </div>
@@ -28,11 +31,12 @@ function MovieCard({ movie }) {
                 ⭐ {movie.vote_average.toFixed(1)}
             </div>
 
+            <button className={`favorite-btn ${favorite ? "active" : ""}`} onClick={handleFavourite}>
+                <span className="heart-icon">❤️</span>
+            </button>
+
             {/* Overlay with overview */}
             <div className="movie-overlay">
-                <button className={`favorite-btn ${favorite ? "active" : ""}`} onClick={handleFavourite}>
-                    <span className="heart-icon">❤️</span>
-                </button>
                 <p className="movie-overview">{movie.overview}</p>
             </div>
 

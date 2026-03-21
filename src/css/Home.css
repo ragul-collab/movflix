@@ -16,10 +16,10 @@
 .search-input {
     flex: 1;
     padding: 0.75rem 1rem;
-    border: none;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    background-color: #333;
-    color: white;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
     font-size: 1rem;
 }
 
