@@ -1,88 +1,105 @@
 # 🎬 Movflix
 
-A movie discovery web app built with React that lets you search, explore, and save your favourite movies.
+A movie discovery web app built with React, powered by the **Trakt** and **OMDb** APIs.
 
-🔗 **Live Demo:** [ragul07-movflix.vercel.app](https://ragul07-movflix.vercel.app)
-
----
+🌐 **Live Demo:** [movflix-rho.vercel.app](https://movflix-rho.vercel.app)
 
 ## ✨ Features
 
-- 🔍 Search movies by title
-- 🎥 Browse trending & popular movies
-- ⭐ View IMDb ratings and genres
-- 🖼️ Movie posters and overviews
-- ❤️ Add / remove movies from favourites
-- 💾 Favourites saved locally (persists on refresh)
+- 🔍 **Movie Search** — Search for any movie instantly
+- 🎥 **Movie Details Page** — View detailed info including ratings, plot, genre, and runtime
+- ❤️ **Favourites System** — Save and manage your favourite movies locally
+- 🔔 **Toast Notifications** — Get instant feedback when adding or removing favourites
+- 💀 **Skeleton Loading Cards** — Smooth loading placeholders for a better UX
+- 📱 **Responsive Design** — Works across all screen sizes
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **React** + **Vite**
-- **Trakt API** — movie data, ratings, genres, trending
-- **OMDb API** — posters and IMDb metadata
-- **CSS** — custom styling
-- **Vercel** — deployment
+| Technology | Purpose |
+|---|---|
+| React + Vite | Frontend framework & build tool |
+| React Router | Client-side routing |
+| Trakt API | Movie data & search |
+| OMDb API | Posters & additional metadata |
+| Context API | Global state (favourites, toasts) |
+| Vercel | Deployment |
+
+---
+
+## 📁 Project Structure
+
+```
+frontend/
+├── public/
+└── src/
+    ├── assets/
+    ├── components/
+    │   ├── MovieCard.jsx
+    │   ├── NavBar.jsx
+    │   ├── SkeletonCard.jsx
+    │   └── Toast.jsx
+    ├── context/
+    │   ├── MovieContext.jsx
+    │   └── ToastContext.jsx
+    ├── css/
+    ├── pages/
+    │   ├── Home.jsx
+    │   ├── Favourites.jsx
+    │   └── MovieDetails.jsx
+    ├── services/
+    │   └── api.js
+    ├── App.jsx
+    └── main.jsx
+```
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Clone the repo
+### Prerequisites
+- Node.js >= 18
+- Trakt API key
+- OMDb API key
+
+### Installation
+
 ```bash
+# Clone the repo
 git clone https://github.com/ragul-collab/movflix.git
 cd movflix/frontend
-```
 
-### 2. Install dependencies
-```bash
+# Install dependencies
 npm install
+
+# Create a .env file
+cp .env.example .env
 ```
 
-### 3. Set up environment variables
+### Environment Variables
 
-Create a `.env` file in the root folder:
-```properties
-VITE_TRAKT_API_KEY=your_trakt_client_id
+Create a `.env` file in the `frontend/` directory:
+
+```env
+VITE_TRAKT_API_KEY=your_trakt_api_key
 VITE_OMDB_API_KEY=your_omdb_api_key
 ```
 
-Get your free API keys:
-- Trakt → [trakt.tv/oauth/applications/new](https://trakt.tv/oauth/applications/new)
-- OMDb → [omdbapi.com/apikey.aspx](http://www.omdbapi.com/apikey.aspx)
+### Run Locally
 
-### 4. Run the app
 ```bash
 npm run dev
 ```
 
 ---
 
-## 📁 Project Structure
-```
-src/
-├── components/
-│   ├── MovieCard.jsx
-│   └── NavBar.jsx
-├── context/
-│   └── MovieContext.jsx
-├── pages/
-│   ├── Home.jsx
-│   └── Favourites.jsx
-├── services/
-│   └── api.js
-└── css/
-```
+## 📦 Deployment
+
+This app is deployed on **Vercel**. Environment variables are configured in the Vercel dashboard under project settings.
 
 ---
 
-## 🌐 Deployment
+## 📝 License
 
-Deployed on **Vercel** with environment variables configured in the dashboard.
-
----
-
-## 👤 Author
-
-**Ragul** — [github.com/ragul-collab](https://github.com/ragul-collab)
+ragul-collab
