@@ -47,7 +47,18 @@ function MovieDetails() {
             
             <div className="details-header">
                 <div className="details-poster">
-                    <img src={movie.poster_path || "/no-poster.png"} alt={movie.title} />
+                    <img 
+                        src={movie.poster_path || "/no-poster.png"} 
+                        alt={movie.title}
+                        onError={(e) => {
+                            if (e.target.src.includes("SX1000")) {
+                                e.target.src = e.target.src.replace("SX1000", "SX300");
+                            } else {
+                                e.target.onerror = null;
+                                e.target.src = "/no-poster.png";
+                            }
+                        }}
+                    />
                 </div>
                 
                 <div className="details-info">

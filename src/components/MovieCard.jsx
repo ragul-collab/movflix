@@ -23,7 +23,18 @@ function MovieCard({ movie }) {
     return (
         <div className="movie-card" onClick={() => navigate(`/movie/${movie.id}`)} style={{ cursor: 'pointer' }}>
             <div className="movie-poster">
-                <img src={movie.poster_path || "/no-poster.png"} alt={movie.title} />
+                <img 
+                    src={movie.poster_path || "/no-poster.png"} 
+                    alt={movie.title}
+                    onError={(e) => {
+                        if (e.target.src.includes("SX1000")) {
+                            e.target.src = e.target.src.replace("SX1000", "SX300");
+                        } else {
+                            e.target.onerror = null;
+                            e.target.src = "/no-poster.png";
+                        }
+                    }}
+                />
             </div>
 
             {/* Rating Badge */}
