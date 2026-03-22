@@ -1,13 +1,13 @@
-/* Wrapper handles min height */
+
 .app-container {
     min-height: 100vh;
 }
 
-/* MAIN CONTENT */
+
 .main-content {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 100px 1rem 2rem; /* Clearing the fixed navbar */
+    padding: 100px 1rem 2rem;
     box-sizing: border-box;
 }
 
@@ -19,6 +19,6 @@
 
 @media (max-width: 480px) {
     .main-content {
-        padding: 110px 0.5rem 2rem; /* Navbar wraps on small mobile making it taller */
+        padding: 110px 0.5rem 2rem; 
     }
 }

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
 :root {
   /* DARK MODE VARIABLES (DEFAULT) */
   --bg-primary: #121212;
@@ -13,7 +15,7 @@
   --input-bg: #333333;
   --input-focus: #e50914;
 
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Outfit', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -105,4 +107,3 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-/* Removed hardcoded media prefeers-color-scheme as we are handling it manually with .light class */
