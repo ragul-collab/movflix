@@ -10,7 +10,8 @@ const homeCache = {
     movies: [],
     page: 1,
     queryParam: null,
-    scrollY: 0
+    scrollY: 0,
+    totalResults: 0,
 };
 
 function Home() {
@@ -22,6 +23,7 @@ function Home() {
 
     const [searchInput, setSearchInput] = useState(queryParam);
     const [movies, setMovies] = useState(isMatch ? homeCache.movies : []);
+    const [totalResults, setTotalResults] = useState(isMatch ? homeCache.totalResults : 0);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(!isMatch);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -43,7 +45,8 @@ function Home() {
         homeCache.movies = movies;
         homeCache.page = page;
         homeCache.queryParam = queryParam;
-    }, [movies, page, queryParam]);
+        homeCache.totalResults = totalResults;
+    }, [movies, page, queryParam, totalResults]);
 
     // Infinite scroll listener & Scroll restoration
     useEffect(() => {
@@ -82,11 +85,21 @@ function Home() {
             setError(null);
             
             try {
-                const results = queryParam 
+                const result = queryParam 
                     ? await searchMovies(queryParam, page) 
                     : await getPopularMovies(page);
-                    
-                setMovies(prev => page === 1 ? results : [...prev, ...results]);
+
+                const { movies: newMovies, totalResults: total } = result;
+
+                setTotalResults(total);
+
+                setMovies(prev => {
+                    if (page === 1) return newMovies;
+                    // Deduplicate: filter out any movie already in prev by id
+                    const existingIds = new Set(prev.map(m => m.id));
+                    const unique = newMovies.filter(m => !existingIds.has(m.id));
+                    return [...prev, ...unique];
+                });
             } catch (err) {
                 console.log(err);
                 setError("Failed to load movies....");
@@ -107,25 +120,50 @@ function Home() {
         }
     };
 
+    const handleClear = () => {
+        setSearchInput("");
+        setSearchParams({});
+    };
+
     return (
         <div className="home">
             <form onSubmit={handleSearch} className="search-form">
-                <input
-                    type="text"
-                    placeholder="search for movies..."
-                    className="search-input"
-                    value={searchInput}
-                    onChange={(e) => {
-                        setSearchInput(e.target.value);
-                        if (e.target.value === "") {
-                            setSearchParams({});
-                        }
-                    }}
-                />
-                <button className="search-btn" type="submit">search</button>
+                <div className="search-input-wrapper">
+                    <input
+                        type="text"
+                        placeholder="search for movies..."
+                        className="search-input"
+                        value={searchInput}
+                        onChange={(e) => {
+                            setSearchInput(e.target.value);
+                            if (e.target.value === "") {
+                                setSearchParams({});
+                            }
+                        }}
+                    />
+                    {searchInput && (
+                        <button
+                            type="button"
+                            className="search-clear-btn"
+                            onClick={handleClear}
+                            aria-label="Clear search"
+                        >
+                            ✕
+                        </button>
+                    )}
+                </div>
+                <button className="search-btn" type="submit">Search</button>
             </form>
 
-            {error && <p>{error}</p>}
+            {queryParam && !loading && (
+                <p className="search-results-count">
+                    {totalResults > 0
+                        ? `Found ${totalResults.toLocaleString()} results for "${queryParam}"`
+                        : `No results found for "${queryParam}"`}
+                </p>
+            )}
+
+            {error && <p className="search-error">{error}</p>}
 
             {/* Display skeletons if loading first page, otherwise display movies */}
             {loading ? (

@@ -63,8 +63,10 @@ export const getPopularMovies = async (page = 1) => {
   const res = await fetch(`${TRAKT_BASE}/movies/trending?limit=20&page=${page}&extended=full`, {
     headers: TRAKT_HEADERS,
   });
+  const totalResults = parseInt(res.headers.get("x-pagination-item-count") || "0", 10);
   const data = await res.json();
-  return Promise.all(data.map((item) => enrichWithPoster(item.movie)));
+  const movies = await Promise.all(data.map((item) => enrichWithPoster(item.movie)));
+  return { movies, totalResults };
 };
 
 export const searchMovies = async (query, page = 1) => {
@@ -72,8 +74,10 @@ export const searchMovies = async (query, page = 1) => {
     `${TRAKT_BASE}/search/movie?query=${encodeURIComponent(query)}&limit=20&page=${page}&extended=full`,
     { headers: TRAKT_HEADERS }
   );
+  const totalResults = parseInt(res.headers.get("x-pagination-item-count") || "0", 10);
   const data = await res.json();
-  return Promise.all(data.map((item) => enrichWithPoster(item.movie)));
+  const movies = await Promise.all(data.map((item) => enrichWithPoster(item.movie)));
+  return { movies, totalResults };
 };
 
 export const getMovieDetails = async (id) => {
