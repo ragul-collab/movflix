@@ -1,8 +1,9 @@
 import MovieCard from "../components/MovieCard";
+import MovieRow from "../components/MovieRow";
 import SkeletonCard from "../components/SkeletonCard";
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useSearchParams } from "react-router-dom";
-import { searchMovies, getPopularMovies } from "../services/api";
+import { searchMovies, getPopularMovies, getTrendingMovies, getTopRatedMovies } from "../services/api";
 import '../css/Home.css';
 
 // Global cache for Home page to persist data and scroll position across unmounts
@@ -18,7 +19,6 @@ function Home() {
     const [searchParams, setSearchParams] = useSearchParams();
     const queryParam = searchParams.get("q") || "";
 
-    // Check if we can safely restore from cache
     const isMatch = homeCache.queryParam === queryParam && homeCache.movies.length > 0;
 
     const [searchInput, setSearchInput] = useState(queryParam);
@@ -29,18 +29,107 @@ function Home() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [page, setPage] = useState(isMatch ? homeCache.page : 1);
 
-    const initialMountCached = useRef(isMatch);
+    // ── Trending Now (Recent Releases) ──
+    const [trendingMovies, setTrendingMovies]     = useState([]);
+    const [trendingPage, setTrendingPage]         = useState(1);
+    const [trendingLoading, setTrendingLoading]   = useState(true);
+    const [trendingLoadMore, setTrendingLoadMore] = useState(false);
+    const [trendingHasMore, setTrendingHasMore]   = useState(true);
+    const trendingFetching = useRef(false);
 
-    // Sync input with the URL query parameter (handles back button or clicking Home nav)
+    // ── Top Rated ──
+    const [topRatedMovies, setTopRatedMovies]     = useState([]);
+    const [topRatedPage, setTopRatedPage]         = useState(1);
+    const [topRatedLoading, setTopRatedLoading]   = useState(true);
+    const [topRatedLoadMore, setTopRatedLoadMore] = useState(false);
+    const [topRatedHasMore, setTopRatedHasMore]   = useState(true);
+    const topRatedFetching = useRef(false);
+
+    const initialMountCached = useRef(isMatch);
+    const isSearching = !!queryParam;
+
+    // ── Fetch Trending page ──
+    useEffect(() => {
+        if (isSearching) return;
+        if (trendingFetching.current) return;
+        if (!trendingHasMore && trendingPage > 1) return;
+
+        trendingFetching.current = true;
+        const isFirst = trendingPage === 1;
+        if (isFirst) setTrendingLoading(true);
+        else setTrendingLoadMore(true);
+
+        getTrendingMovies(trendingPage)
+            .then(data => {
+                if (data.length === 0) {
+                    setTrendingHasMore(false);
+                } else {
+                    setTrendingMovies(prev => {
+                        if (isFirst) return data;
+                        const ids = new Set(prev.map(m => m.id));
+                        return [...prev, ...data.filter(m => !ids.has(m.id))];
+                    });
+                }
+            })
+            .catch(() => setTrendingHasMore(false))
+            .finally(() => {
+                setTrendingLoading(false);
+                setTrendingLoadMore(false);
+                trendingFetching.current = false;
+            });
+    }, [trendingPage, isSearching]);
+
+    // ── Fetch Top Rated page ──
+    useEffect(() => {
+        if (isSearching) return;
+        if (topRatedFetching.current) return;
+        if (!topRatedHasMore && topRatedPage > 1) return;
+
+        topRatedFetching.current = true;
+        const isFirst = topRatedPage === 1;
+        if (isFirst) setTopRatedLoading(true);
+        else setTopRatedLoadMore(true);
+
+        getTopRatedMovies(topRatedPage)
+            .then(data => {
+                if (data.length === 0) {
+                    setTopRatedHasMore(false);
+                } else {
+                    setTopRatedMovies(prev => {
+                        if (isFirst) return data;
+                        const ids = new Set(prev.map(m => m.id));
+                        return [...prev, ...data.filter(m => !ids.has(m.id))];
+                    });
+                }
+            })
+            .catch(() => setTopRatedHasMore(false))
+            .finally(() => {
+                setTopRatedLoading(false);
+                setTopRatedLoadMore(false);
+                topRatedFetching.current = false;
+            });
+    }, [topRatedPage, isSearching]);
+
+    // ── Load more callbacks for rows ──
+    const handleTrendingLoadMore = useCallback(() => {
+        if (!trendingFetching.current && trendingHasMore && !trendingLoadMore) {
+            setTrendingPage(p => p + 1);
+        }
+    }, [trendingHasMore, trendingLoadMore]);
+
+    const handleTopRatedLoadMore = useCallback(() => {
+        if (!topRatedFetching.current && topRatedHasMore && !topRatedLoadMore) {
+            setTopRatedPage(p => p + 1);
+        }
+    }, [topRatedHasMore, topRatedLoadMore]);
+
+    // ── Sync URL query param ──
     useEffect(() => {
         setSearchInput(queryParam);
-        // Reset page if it's a completely new search (not a cache restoration)
-        if (queryParam !== homeCache.queryParam) {
-            setPage(1);
-        }
+        if (queryParam !== homeCache.queryParam) setPage(1);
     }, [queryParam]);
 
-    // Save state to cache
+    // ── Save to cache ──
     useEffect(() => {
         homeCache.movies = movies;
         homeCache.page = page;
@@ -48,57 +137,45 @@ function Home() {
         homeCache.totalResults = totalResults;
     }, [movies, page, queryParam, totalResults]);
 
-    // Infinite scroll listener & Scroll restoration
+    // ── Infinite vertical scroll + scroll restoration ──
     useEffect(() => {
         if (initialMountCached.current) {
-            // Restore scroll after a microscopic delay to ensure the browser has painted the DOM
-            setTimeout(() => {
-                window.scrollTo(0, homeCache.scrollY);
-            }, 0);
+            setTimeout(() => window.scrollTo(0, homeCache.scrollY), 0);
         }
 
         const handleScroll = () => {
-            homeCache.scrollY = window.scrollY; // Constantly track the user's scroll position
-
-            // Check if user is near bottom
+            homeCache.scrollY = window.scrollY;
             if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 200) {
-                if (!loading && !loadingMore) {
-                    setPage(prev => prev + 1);
-                }
+                if (!loading && !loadingMore) setPage(prev => prev + 1);
             }
         };
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, [loading, loadingMore]);
 
-    // Fetch movies when query or page changes
+    // ── Fetch popular/search movies ──
     useEffect(() => {
-        // Skip the very first fetch IF we successfully restored from memory cache
         if (initialMountCached.current) {
             initialMountCached.current = false;
-            return; 
+            return;
         }
 
         const fetchMovies = async () => {
             if (page === 1) setLoading(true);
             else setLoadingMore(true);
             setError(null);
-            
+
             try {
-                const result = queryParam 
-                    ? await searchMovies(queryParam, page) 
+                const result = queryParam
+                    ? await searchMovies(queryParam, page)
                     : await getPopularMovies(page);
 
                 const { movies: newMovies, totalResults: total } = result;
-
                 setTotalResults(total);
-
                 setMovies(prev => {
                     if (page === 1) return newMovies;
-                    // Deduplicate: filter out any movie already in prev by id
-                    const existingIds = new Set(prev.map(m => m.id));
-                    const unique = newMovies.filter(m => !existingIds.has(m.id));
-                    return [...prev, ...unique];
+                    const ids = new Set(prev.map(m => m.id));
+                    return [...prev, ...newMovies.filter(m => !ids.has(m.id))];
                 });
             } catch (err) {
                 console.log(err);
@@ -113,11 +190,8 @@ function Home() {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        if (!searchInput.trim()) {
-            setSearchParams({});
-        } else {
-            setSearchParams({ q: searchInput });
-        }
+        if (!searchInput.trim()) setSearchParams({});
+        else setSearchParams({ q: searchInput });
     };
 
     const handleClear = () => {
@@ -127,27 +201,21 @@ function Home() {
 
     return (
         <div className="home">
+            {/* ── SEARCH BAR ── */}
             <form onSubmit={handleSearch} className="search-form">
                 <div className="search-input-wrapper">
                     <input
                         type="text"
-                        placeholder="search for movies..."
+                        placeholder="Search for movies..."
                         className="search-input"
                         value={searchInput}
                         onChange={(e) => {
                             setSearchInput(e.target.value);
-                            if (e.target.value === "") {
-                                setSearchParams({});
-                            }
+                            if (e.target.value === "") setSearchParams({});
                         }}
                     />
                     {searchInput && (
-                        <button
-                            type="button"
-                            className="search-clear-btn"
-                            onClick={handleClear}
-                            aria-label="Clear search"
-                        >
+                        <button type="button" className="search-clear-btn" onClick={handleClear} aria-label="Clear search">
                             ✕
                         </button>
                     )}
@@ -155,7 +223,8 @@ function Home() {
                 <button className="search-btn" type="submit">Search</button>
             </form>
 
-            {queryParam && !loading && (
+            {/* ── SEARCH RESULTS COUNT ── */}
+            {isSearching && !loading && (
                 <p className="search-results-count">
                     {totalResults > 0
                         ? `Found ${totalResults.toLocaleString()} results for "${queryParam}"`
@@ -165,12 +234,36 @@ function Home() {
 
             {error && <p className="search-error">{error}</p>}
 
-            {/* Display skeletons if loading first page, otherwise display movies */}
+            {/* ── HOME ROWS: only when not searching ── */}
+            {!isSearching && (
+                <>
+                    <MovieRow
+                        title="New Releases"
+                        icon="🎬"
+                        movies={trendingMovies}
+                        loading={trendingLoading}
+                        loadingMore={trendingLoadMore}
+                        onLoadMore={handleTrendingLoadMore}
+                    />
+                    <MovieRow
+                        title="Top Rated"
+                        icon="⭐"
+                        movies={topRatedMovies}
+                        loading={topRatedLoading}
+                        loadingMore={topRatedLoadMore}
+                        onLoadMore={handleTopRatedLoadMore}
+                    />
+
+                    <div className="section-divider">
+                        <span className="section-divider-label">Popular Movies</span>
+                    </div>
+                </>
+            )}
+
+            {/* ── MOVIES GRID ── */}
             {loading ? (
                 <div className="movies-grid">
-                    {[...Array(8)].map((_, i) => (
-                        <SkeletonCard key={i} />
-                    ))}
+                    {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
                 </div>
             ) : (
                 <div className="movies-grid">
@@ -179,16 +272,14 @@ function Home() {
                     )}
                 </div>
             )}
-            
+
             {loadingMore && (
                 <div className="movies-grid">
-                    {[...Array(4)].map((_, i) => (
-                        <SkeletonCard key={`more-${i}`} />
-                    ))}
+                    {[...Array(4)].map((_, i) => <SkeletonCard key={`more-${i}`} />)}
                 </div>
             )}
         </div>
-    )
+    );
 }
 
 export default Home;

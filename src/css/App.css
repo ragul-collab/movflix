@@ -1,8 +1,9 @@
 
 .app-container {
     min-height: 100vh;
+    /* gradient lives on body, container is transparent */
+    background: transparent;
 }
-
 
 .main-content {
     max-width: 1400px;
@@ -19,6 +20,6 @@
 
 @media (max-width: 480px) {
     .main-content {
-        padding: 110px 0.5rem 2rem; 
+        padding: 110px 0.5rem 2rem;
     }
 }
