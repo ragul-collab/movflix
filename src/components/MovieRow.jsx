@@ -25,11 +25,20 @@ function MovieRow({ title, movies = [], loading = false, loadingMore = false, on
     };
 
     // Infinite horizontal scroll — fires onLoadMore when near right edge
+    const ticking = useRef(false);
     const handleScroll = useCallback(() => {
         if (!rowRef.current || !onLoadMore || loadingMore) return;
-        const { scrollLeft, scrollWidth, clientWidth } = rowRef.current;
-        if (scrollLeft + clientWidth >= scrollWidth - 300) {
-            onLoadMore();
+        if (!ticking.current) {
+            window.requestAnimationFrame(() => {
+                if (rowRef.current) {
+                    const { scrollLeft, scrollWidth, clientWidth } = rowRef.current;
+                    if (scrollLeft + clientWidth >= scrollWidth - 300) {
+                        onLoadMore();
+                    }
+                }
+                ticking.current = false;
+            });
+            ticking.current = true;
         }
     }, [onLoadMore, loadingMore]);
 

@@ -13,6 +13,10 @@ const homeCache = {
     queryParam: null,
     scrollY: 0,
     totalResults: 0,
+    trendingMovies: [],
+    trendingPage: 1,
+    topRatedMovies: [],
+    topRatedPage: 1,
 };
 
 function Home() {
@@ -29,28 +33,37 @@ function Home() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [page, setPage] = useState(isMatch ? homeCache.page : 1);
 
+    const hasTrendingCache = homeCache.trendingMovies.length > 0;
+    const hasTopRatedCache = homeCache.topRatedMovies.length > 0;
+
     // ── Trending Now (Recent Releases) ──
-    const [trendingMovies, setTrendingMovies]     = useState([]);
-    const [trendingPage, setTrendingPage]         = useState(1);
-    const [trendingLoading, setTrendingLoading]   = useState(true);
+    const [trendingMovies, setTrendingMovies]     = useState(hasTrendingCache ? homeCache.trendingMovies : []);
+    const [trendingPage, setTrendingPage]         = useState(hasTrendingCache ? homeCache.trendingPage : 1);
+    const [trendingLoading, setTrendingLoading]   = useState(!hasTrendingCache);
     const [trendingLoadMore, setTrendingLoadMore] = useState(false);
     const [trendingHasMore, setTrendingHasMore]   = useState(true);
     const trendingFetching = useRef(false);
 
     // ── Top Rated ──
-    const [topRatedMovies, setTopRatedMovies]     = useState([]);
-    const [topRatedPage, setTopRatedPage]         = useState(1);
-    const [topRatedLoading, setTopRatedLoading]   = useState(true);
+    const [topRatedMovies, setTopRatedMovies]     = useState(hasTopRatedCache ? homeCache.topRatedMovies : []);
+    const [topRatedPage, setTopRatedPage]         = useState(hasTopRatedCache ? homeCache.topRatedPage : 1);
+    const [topRatedLoading, setTopRatedLoading]   = useState(!hasTopRatedCache);
     const [topRatedLoadMore, setTopRatedLoadMore] = useState(false);
     const [topRatedHasMore, setTopRatedHasMore]   = useState(true);
     const topRatedFetching = useRef(false);
 
     const initialMountCached = useRef(isMatch);
+    const trendingInitialCached = useRef(hasTrendingCache);
+    const topRatedInitialCached = useRef(hasTopRatedCache);
     const isSearching = !!queryParam;
 
     // ── Fetch Trending page ──
     useEffect(() => {
         if (isSearching) return;
+        if (trendingInitialCached.current) {
+            trendingInitialCached.current = false;
+            return;
+        }
         if (trendingFetching.current) return;
         if (!trendingHasMore && trendingPage > 1) return;
 
@@ -82,6 +95,10 @@ function Home() {
     // ── Fetch Top Rated page ──
     useEffect(() => {
         if (isSearching) return;
+        if (topRatedInitialCached.current) {
+            topRatedInitialCached.current = false;
+            return;
+        }
         if (topRatedFetching.current) return;
         if (!topRatedHasMore && topRatedPage > 1) return;
 
@@ -135,7 +152,11 @@ function Home() {
         homeCache.page = page;
         homeCache.queryParam = queryParam;
         homeCache.totalResults = totalResults;
-    }, [movies, page, queryParam, totalResults]);
+        homeCache.trendingMovies = trendingMovies;
+        homeCache.trendingPage = trendingPage;
+        homeCache.topRatedMovies = topRatedMovies;
+        homeCache.topRatedPage = topRatedPage;
+    }, [movies, page, queryParam, totalResults, trendingMovies, trendingPage, topRatedMovies, topRatedPage]);
 
     // ── Infinite vertical scroll + scroll restoration ──
     useEffect(() => {
@@ -143,10 +164,17 @@ function Home() {
             setTimeout(() => window.scrollTo(0, homeCache.scrollY), 0);
         }
 
+        let ticking = false;
         const handleScroll = () => {
             homeCache.scrollY = window.scrollY;
-            if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 200) {
-                if (!loading && !loadingMore) setPage(prev => prev + 1);
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 200) {
+                        if (!loading && !loadingMore) setPage(prev => prev + 1);
+                    }
+                    ticking = false;
+                });
+                ticking = true;
             }
         };
         window.addEventListener("scroll", handleScroll);
